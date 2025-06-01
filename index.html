@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Money Splitter with Transactions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            max-width: 100%;
+            margin: 10px;
+            padding: 15px;
+            box-sizing: border-box;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 12px;
+            gap: 8px;
+        }
+        label {
+            color: #34495e;
+            font-weight: 600;
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+        input {
+            padding: 12px;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        button {
+            padding: 12px;
+            background: linear-gradient(45deg, #007bff, #00c4b4);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            width: 100%;
+            margin: 10px 0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            touch-action: manipulation;
+        }
+        button:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+        #result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .error {
+            color: #e74c3c;
+            margin: 10px 0;
+            font-size: 0.9em;
+            text-align: center;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            padding: 8px 0;
+            color: #2c3e50;
+            font-size: 0.9em;
+        }
+        li:before {
+            content: '→ ';
+            color: #007bff;
+        }
+        @media (min-width: 600px) {
+            body {
+                max-width: 700px;
+                margin: 20px auto;
+                padding: 20px;
+            }
+            .input-group {
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+            }
+            input {
+                width: 200px;
+            }
+            button {
+                width: auto;
+                padding: 12px 24px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Money Splitter</h1>
+    <div class="card">
+        <div class="input-group">
+            <label for="numPeople">Number of people:</label>
+            <input type="number" id="numPeople" min="1" required>
+            <button onclick="generateInputs()">Set People</button>
+        </div>
+        <div id="peopleInputs"></div>
+        <button id="calculateBtn" onclick="calculateSplit()" style="display: none;">Calculate</button>
+        <div id="error" class="error"></div>
+    </div>
+    <div id="result" class="card"></div>
+
+    <script>
+        function generateInputs() {
+            const numPeople = parseInt(document.getElementById('numPeople').value);
+            const errorDiv = document.getElementById('error');
+            const peopleInputs = document.getElementById('peopleInputs');
+            const calculateBtn = document.getElementById('calculateBtn');
+
+            errorDiv.textContent = '';
+            peopleInputs.innerHTML = '';
+
+            if (isNaN(numPeople) || numPeople <= 0) {
+                errorDiv.textContent = 'Please enter a positive number of people';
+                return;
+            }
+
+            for (let i = 0; i < numPeople; i++) {
+                const inputGroup = document.createElement('div');
+                inputGroup.className = 'input-group';
+                inputGroup.innerHTML = `
+                    <label for="name${i}">Name ${i + 1}:</label>
+                    <input type="text" id="name${i}" placeholder="Enter name" required>
+                    <label for="amount${i}">Amount spent ($):</label>
+                    <input type="number" id="amount${i}" min="0" step="0.01" placeholder="Enter amount" required>
+                `;
+                peopleInputs.appendChild(inputGroup);
+            }
+
+            calculateBtn.style.display = 'block';
+        }
+
+        function calculateSplit() {
+            const numPeople = parseInt(document.getElementById('numPeople').value);
+            const errorDiv = document.getElementById('error');
+            const resultDiv = document.getElementById('result');
+
+            errorDiv.textContent = '';
+            resultDiv.style.display = 'none';
+
+            const names = [];
+            const amounts = [];
+
+            for (let i = 0; i < numPeople; i++) {
+                const name = document.getElementById(`name${i}`).value.trim();
+                const amount = parseFloat(document.getElementById(`amount${i}`).value);
+
+                if (!name) {
+                    errorDiv.textContent = `Name for person ${i + 1} cannot be empty`;
+                    return;
+                }
+                if (isNaN(amount) || amount < 0) {
+                    errorDiv.textContent = `Invalid amount for person ${i + 1}`;
+                    return;
+                }
+
+                names.push(name);
+                amounts.push(amount);
+            }
+
+            const totalSpent = amounts.reduce((sum, curr) => sum + curr, 0);
+            const perPersonShare = totalSpent / numPeople;
+            const balances = amounts.map(amount => amount - perPersonShare);
+
+            let resultHTML = `<h3>Summary</h3>`;
+            resultHTML += `<p>Total spent: $${totalSpent.toFixed(2)}</p>`;
+            resultHTML += `<p>Per person share: $${perPersonShare.toFixed(2)}</p>`;
+            resultHTML += `<h4>Balances:</h4><ul>`;
+            for (let i = 0; i < numPeople; i++) {
+                if (balances[i] > 0) {
+                    resultHTML += `<li>${names[i]} should receive $${balances[i].toFixed(2)}</li>`;
+                } else if (balances[i] < 0) {
+                    resultHTML += `<li>${names[i]} should pay $${Math.abs(balances[i]).toFixed(2)}</li>`;
+                } else {
+                    resultHTML += `<li>${names[i]} is settled</li>`;
+                }
+            }
+            resultHTML += `</ul>`;
+
+            const transactions = [];
+            const debtors = [];
+            const creditors = [];
+
+            for (let i = 0; i < numPeople; i++) {
+                if (balances[i] < -0.01) {
+                    debtors.push({ name: names[i], amount: Math.abs(balances[i]) });
+                } else if (balances[i] > 0.01) {
+                    creditors.push({ name: names[i], amount: balances[i] });
+                }
+            }
+
+            while (debtors.length > 0 && creditors.length > 0) {
+                const debtor = debtors[0];
+                const creditor = creditors[0];
+                const amount = Math.min(debtor.amount, creditor.amount);
+
+                transactions.push(`${debtor.name} pays $${amount.toFixed(2)} to ${creditor.name}`);
+
+                debtor.amount -= amount;
+                creditor.amount -= amount;
+
+                if (debtor.amount < 0.01) debtors.shift();
+                if (creditor.amount < 0.01) creditors.shift();
+            }
+
+            resultHTML += `<h4>Transactions to Settle:</h4>`;
+            if (transactions.length === 0) {
+                resultHTML += `<p>Everyone is settled!</p>`;
+            } else {
+                resultHTML += `<ul>`;
+                transactions.forEach(transaction => {
+                    resultHTML += `<li>${transaction}</li>`;
+                });
+                resultHTML += `</ul>`;
+            }
+
+            resultDiv.innerHTML = resultHTML;
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
