@@ -3,266 +3,725 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Money Splitter with Transactions</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>SplitWise Minimal - Multi Expense Splitter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
-            max-width: 100%;
-            margin: 10px;
-            padding: 15px;
+        :root {
+            --primary: #4361ee;
+            --primary-hover: #3a56d4;
+            --primary-light: #eef2ff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --neutral-bg: #f8fafc;
+            --border: #e2e8f0;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --card-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+        }
+
+        * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(145deg, #f1f5f9 0%, #e2e8f0 100%);
+            margin: 0;
+            padding: 24px 16px;
             min-height: 100vh;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            font-weight: 600;
-            font-size: 1.8em;
-            margin-bottom: 15px;
-        }
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: transform 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-3px);
-        }
-        .input-group {
+
+        .container {
+            width: 100%;
+            max-width: 620px;
             display: flex;
             flex-direction: column;
-            margin-bottom: 12px;
-            gap: 8px;
+            gap: 20px;
         }
-        label {
-            color: #34495e;
-            font-weight: 600;
-            font-size: 1em;
-            margin-bottom: 5px;
-        }
-        input {
-            padding: 12px;
-            border: 1px solid #dfe6e9;
-            border-radius: 8px;
-            width: 100%;
-            box-sizing: border-box;
-            font-size: 1em;
-            transition: border-color 0.3s ease;
-        }
-        input:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-        button {
-            padding: 12px;
-            background: linear-gradient(45deg, #007bff, #00c4b4);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1em;
-            width: 100%;
-            margin: 10px 0;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            touch-action: manipulation;
-        }
-        button:hover {
-            transform: scale(1.03);
-            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
-        }
-        #result {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 12px;
-            background: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: none;
-            animation: fadeIn 0.5s ease-in;
-        }
-        .error {
-            color: #e74c3c;
-            margin: 10px 0;
-            font-size: 0.9em;
+
+        .app-header {
             text-align: center;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .app-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        ul {
-            list-style: none;
-            padding: 0;
+
+        .app-header p {
+            margin: 6px 0 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
         }
-        li {
-            padding: 8px 0;
-            color: #2c3e50;
-            font-size: 0.9em;
+
+        .card {
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: var(--card-shadow);
+            padding: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: transform 0.25s ease, opacity 0.25s ease;
         }
-        li:before {
-            content: '→ ';
-            color: #007bff;
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
         }
-        @media (min-width: 600px) {
-            body {
-                max-width: 700px;
-                margin: 20px auto;
-                padding: 20px;
-            }
-            .input-group {
-                flex-direction: row;
-                align-items: center;
-                gap: 10px;
-            }
-            input {
-                width: 200px;
-            }
-            button {
-                width: auto;
-                padding: 12px 24px;
-            }
-            h1 {
-                font-size: 2em;
+
+        .card-header h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        }
+
+        button {
+            padding: 13px 20px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            font-family: inherit;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--neutral-bg);
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            font-size: 0.8rem;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* Interactive Participant Chips */
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .chip {
+            padding: 8px 14px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            border: 1.5px solid var(--border);
+            background: var(--neutral-bg);
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chip.active {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.15);
+        }
+
+        .chip.active::before {
+            content: "✓";
+            font-weight: 800;
+        }
+
+        .live-preview {
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .live-preview strong {
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        /* Expense item row */
+        .expense-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            background: #fff;
+            transition: all 0.2s ease;
+        }
+
+        .expense-card:hover {
+            border-color: #cbd5e1;
+            transform: translateX(2px);
+        }
+
+        .expense-info-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .expense-info-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .expense-amount-tag {
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            margin-right: 12px;
+        }
+
+        .btn-icon {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-icon:hover {
+            color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        /* Settlement Visual Cards */
+        .balance-pill {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .balance-pill.positive {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        .balance-pill.negative {
+            background: var(--danger-light);
+            color: #991b1b;
+        }
+
+        .balance-pill.neutral {
+            background: var(--neutral-bg);
+            color: var(--text-muted);
+        }
+
+        .transfer-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #ffffff;
+            border: 1.5px dashed var(--primary);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .transfer-people {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .transfer-arrow {
+            color: var(--primary);
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 500px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <h1>Money Splitter</h1>
-    <div class="card">
-        <div class="input-group">
-            <label for="numPeople">Number of people:</label>
-            <input type="number" id="numPeople" min="1" required>
-            <button onclick="generateInputs()">Set People</button>
-        </div>
-        <div id="peopleInputs"></div>
-        <button id="calculateBtn" onclick="calculateSplit()" style="display: none;">Calculate</button>
-        <div id="error" class="error"></div>
+
+<div class="container">
+    <div class="app-header">
+        <h1>FairSplit</h1>
+        <p>Split group costs accurately and easily</p>
     </div>
-    <div id="result" class="card"></div>
 
-    <script>
-        function generateInputs() {
-            const numPeople = parseInt(document.getElementById('numPeople').value);
-            const errorDiv = document.getElementById('error');
-            const peopleInputs = document.getElementById('peopleInputs');
-            const calculateBtn = document.getElementById('calculateBtn');
+    <!-- STEP 1: People Setup -->
+    <div class="card" id="step1Card">
+        <div class="card-header">
+            <h2><span class="step-badge">1</span> Participants</h2>
+        </div>
+        <div class="input-group">
+            <label for="numPeople">How many people are in the group?</label>
+            <input type="number" id="numPeople" min="2" placeholder="e.g. 3">
+        </div>
+        <button class="btn-primary" onclick="generateNameInputs()">Continue</button>
+        <div id="step1Error" class="error-msg"></div>
 
-            errorDiv.textContent = '';
-            peopleInputs.innerHTML = '';
+        <div id="namesContainer" class="hidden" style="margin-top: 18px;">
+            <label>Enter their names:</label>
+            <div id="nameFields" style="display: flex; flex-direction: column; gap: 8px; margin: 8px 0 16px;"></div>
+            <button class="btn-primary" onclick="confirmParticipants()">Set Names & Start Adding Expenses</button>
+        </div>
+    </div>
 
-            if (isNaN(numPeople) || numPeople <= 0) {
-                errorDiv.textContent = 'Please enter a positive number of people';
+    <!-- STEP 2: Multi Expenses -->
+    <div class="card hidden" id="step2Card">
+        <div class="card-header">
+            <h2><span class="step-badge">2</span> Add an Expense</h2>
+            <button class="btn-secondary" onclick="resetPeople()">Edit Group</button>
+        </div>
+
+        <div class="grid-2">
+            <div class="input-group">
+                <label for="expDesc">Description</label>
+                <input type="text" id="expDesc" placeholder="e.g., Pizza Dinner">
+            </div>
+            <div class="input-group">
+                <label for="expAmount">Amount ($)</label>
+                <input type="number" id="expAmount" min="0.01" step="0.01" placeholder="0.00" oninput="updateLivePreview()">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="expPayer">Paid By</label>
+            <select id="expPayer"></select>
+        </div>
+
+        <div class="input-group">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label>Split Between (click to toggle)</label>
+                <div style="display: flex; gap: 6px;">
+                    <button type="button" class="btn-secondary" onclick="toggleAllChips(true)">All</button>
+                    <button type="button" class="btn-secondary" onclick="toggleAllChips(false)">Clear</button>
+                </div>
+            </div>
+            <div class="chip-group" id="participantChips"></div>
+        </div>
+
+        <!-- Real-time split preview -->
+        <div class="live-preview" id="liveSplitPreview">
+            <span>Split Preview:</span>
+            <span id="previewText">Enter amount and select people</span>
+        </div>
+
+        <div id="step2Error" class="error-msg"></div>
+        <button class="btn-primary" onclick="submitExpense()">+ Add Expense</button>
+
+        <!-- Current Expense Items -->
+        <div style="margin-top: 24px;">
+            <div class="card-header" style="margin-bottom: 8px;">
+                <label style="margin: 0;">Expenses Added (<span id="expenseCount">0</span>)</label>
+                <span id="totalGroupAmount" style="font-weight: 700; color: var(--text-dark);">Total: $0.00</span>
+            </div>
+            <div id="expensesFeed"></div>
+        </div>
+
+        <button class="btn-primary" style="margin-top: 14px; background: #0f172a;" onclick="calculateFinalBalances()">Calculate Settlement →</button>
+    </div>
+
+    <!-- STEP 3: Results -->
+    <div class="card hidden" id="step3Card">
+        <div class="card-header">
+            <h2><span class="step-badge">3</span> Final Settle-Up</h2>
+        </div>
+        <div id="finalOutput"></div>
+    </div>
+</div>
+
+<script>
+    let people = [];
+    let expenses = [];
+
+    // Step 1: Create inputs for names
+    function generateNameInputs() {
+        const count = parseInt(document.getElementById('numPeople').value);
+        const err = document.getElementById('step1Error');
+        const container = document.getElementById('namesContainer');
+        const fields = document.getElementById('nameFields');
+        err.textContent = '';
+
+        if (isNaN(count) || count < 2) {
+            err.textContent = 'Please enter at least 2 people.';
+            return;
+        }
+
+        fields.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = `Person ${i + 1} Name`;
+            input.id = `personInput_${i}`;
+            fields.appendChild(input);
+        }
+
+        container.classList.remove('hidden');
+    }
+
+    function confirmParticipants() {
+        const count = parseInt(document.getElementById('numPeople').value);
+        const err = document.getElementById('step1Error');
+        err.textContent = '';
+        const names = [];
+
+        for (let i = 0; i < count; i++) {
+            const val = document.getElementById(`personInput_${i}`).value.trim();
+            if (!val) {
+                err.textContent = `Name for Person ${i + 1} cannot be blank.`;
                 return;
             }
-
-            for (let i = 0; i < numPeople; i++) {
-                const inputGroup = document.createElement('div');
-                inputGroup.className = 'input-group';
-                inputGroup.innerHTML = `
-                    <label for="name${i}">Name ${i + 1}:</label>
-                    <input type="text" id="name${i}" placeholder="Enter name" required>
-                    <label for="amount${i}">Amount spent ($):</label>
-                    <input type="number" id="amount${i}" min="0" step="0.01" placeholder="Enter amount" required>
-                `;
-                peopleInputs.appendChild(inputGroup);
+            if (names.includes(val)) {
+                err.textContent = 'Names must be unique.';
+                return;
             }
-
-            calculateBtn.style.display = 'block';
+            names.push(val);
         }
 
-        function calculateSplit() {
-            const numPeople = parseInt(document.getElementById('numPeople').value);
-            const errorDiv = document.getElementById('error');
-            const resultDiv = document.getElementById('result');
+        people = names;
+        initStep2UI();
+        document.getElementById('step2Card').classList.remove('hidden');
+        document.getElementById('step2Card').scrollIntoView({ behavior: 'smooth' });
+    }
 
-            errorDiv.textContent = '';
-            resultDiv.style.display = 'none';
+    function resetPeople() {
+        if (confirm('Editing group members will reset current expenses. Continue?')) {
+            expenses = [];
+            document.getElementById('step2Card').classList.add('hidden');
+            document.getElementById('step3Card').classList.add('hidden');
+            document.getElementById('step1Card').scrollIntoView({ behavior: 'smooth' });
+        }
+    }
 
-            const names = [];
-            const amounts = [];
+    // Step 2: Initialize UI
+    function initStep2UI() {
+        const payerSelect = document.getElementById('expPayer');
+        const chipsContainer = document.getElementById('participantChips');
 
-            for (let i = 0; i < numPeople; i++) {
-                const name = document.getElementById(`name${i}`).value.trim();
-                const amount = parseFloat(document.getElementById(`amount${i}`).value);
+        payerSelect.innerHTML = people.map(p => `<option value="${p}">${p}</option>`).join('');
 
-                if (!name) {
-                    errorDiv.textContent = `Name for person ${i + 1} cannot be empty`;
-                    return;
-                }
-                if (isNaN(amount) || amount < 0) {
-                    errorDiv.textContent = `Invalid amount for person ${i + 1}`;
-                    return;
-                }
+        chipsContainer.innerHTML = people.map(p => `
+            <div class="chip active" data-person="${p}" onclick="toggleChip(this)">
+                ${p}
+            </div>
+        `).join('');
 
-                names.push(name);
-                amounts.push(amount);
-            }
+        renderExpensesFeed();
+        updateLivePreview();
+    }
 
-            const totalSpent = amounts.reduce((sum, curr) => sum + curr, 0);
-            const perPersonShare = totalSpent / numPeople;
-            const balances = amounts.map(amount => amount - perPersonShare);
+    function toggleChip(chipEl) {
+        chipEl.classList.toggle('active');
+        updateLivePreview();
+    }
 
-            let resultHTML = `<h3>Summary</h3>`;
-            resultHTML += `<p>Total spent: $${totalSpent.toFixed(2)}</p>`;
-            resultHTML += `<p>Per person share: $${perPersonShare.toFixed(2)}</p>`;
-            resultHTML += `<h4>Balances:</h4><ul>`;
-            for (let i = 0; i < numPeople; i++) {
-                if (balances[i] > 0) {
-                    resultHTML += `<li>${names[i]} should receive $${balances[i].toFixed(2)}</li>`;
-                } else if (balances[i] < 0) {
-                    resultHTML += `<li>${names[i]} should pay $${Math.abs(balances[i]).toFixed(2)}</li>`;
-                } else {
-                    resultHTML += `<li>${names[i]} is settled</li>`;
-                }
-            }
-            resultHTML += `</ul>`;
+    function toggleAllChips(state) {
+        document.querySelectorAll('#participantChips .chip').forEach(chip => {
+            if (state) chip.classList.add('active');
+            else chip.classList.remove('active');
+        });
+        updateLivePreview();
+    }
 
-            const transactions = [];
-            const debtors = [];
-            const creditors = [];
+    function getSelectedParticipants() {
+        return Array.from(document.querySelectorAll('#participantChips .chip.active')).map(c => c.dataset.person);
+    }
 
-            for (let i = 0; i < numPeople; i++) {
-                if (balances[i] < -0.01) {
-                    debtors.push({ name: names[i], amount: Math.abs(balances[i]) });
-                } else if (balances[i] > 0.01) {
-                    creditors.push({ name: names[i], amount: balances[i] });
-                }
-            }
+    function updateLivePreview() {
+        const amount = parseFloat(document.getElementById('expAmount').value) || 0;
+        const selected = getSelectedParticipants();
+        const previewEl = document.getElementById('previewText');
 
-            while (debtors.length > 0 && creditors.length > 0) {
-                const debtor = debtors[0];
-                const creditor = creditors[0];
-                const amount = Math.min(debtor.amount, creditor.amount);
+        if (amount > 0 && selected.length > 0) {
+            const perPerson = (amount / selected.length).toFixed(2);
+            previewEl.innerHTML = `<strong>$${perPerson}</strong> each (${selected.length} people)`;
+        } else {
+            previewEl.textContent = selected.length === 0 ? 'Select at least 1 person' : 'Enter a valid amount';
+        }
+    }
 
-                transactions.push(`${debtor.name} pays $${amount.toFixed(2)} to ${creditor.name}`);
+    function submitExpense() {
+        const descInput = document.getElementById('expDesc');
+        const amountInput = document.getElementById('expAmount');
+        const payerSelect = document.getElementById('expPayer');
+        const err = document.getElementById('step2Error');
+        err.textContent = '';
 
-                debtor.amount -= amount;
-                creditor.amount -= amount;
+        const desc = descInput.value.trim() || 'General Expense';
+        const amount = parseFloat(amountInput.value);
+        const payer = payerSelect.value;
+        const beneficiaries = getSelectedParticipants();
 
-                if (debtor.amount < 0.01) debtors.shift();
-                if (creditor.amount < 0.01) creditors.shift();
-            }
+        if (isNaN(amount) || amount <= 0) {
+            err.textContent = 'Please enter a valid amount greater than 0.';
+            return;
+        }
 
-            resultHTML += `<h4>Transactions to Settle:</h4>`;
-            if (transactions.length === 0) {
-                resultHTML += `<p>Everyone is settled!</p>`;
+        if (beneficiaries.length === 0) {
+            err.textContent = 'Please select at least one person this expense was for.';
+            return;
+        }
+
+        expenses.push({
+            id: Date.now(),
+            desc,
+            amount,
+            payer,
+            beneficiaries
+        });
+
+        // Reset
+        descInput.value = '';
+        amountInput.value = '';
+        toggleAllChips(true);
+        updateLivePreview();
+        renderExpensesFeed();
+    }
+
+    function removeExpense(id) {
+        expenses = expenses.filter(e => e.id !== id);
+        renderExpensesFeed();
+    }
+
+    function renderExpensesFeed() {
+        const container = document.getElementById('expensesFeed');
+        const countEl = document.getElementById('expenseCount');
+        const totalEl = document.getElementById('totalGroupAmount');
+
+        countEl.textContent = expenses.length;
+        const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+        totalEl.textContent = `Total: $${total.toFixed(2)}`;
+
+        if (expenses.length === 0) {
+            container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 14px 0;">No expenses logged yet.</div>`;
+            return;
+        }
+
+        container.innerHTML = expenses.map(e => `
+            <div class="expense-card">
+                <div>
+                    <div class="expense-info-title">${e.desc}</div>
+                    <div class="expense-info-sub">
+                        Paid by <strong>${e.payer}</strong> • For: ${e.beneficiaries.join(', ')}
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <div class="expense-amount-tag">$${e.amount.toFixed(2)}</div>
+                    <button class="btn-icon" title="Remove" onclick="removeExpense(${e.id})">✕</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Step 3: Exact Split Calculations
+    function calculateFinalBalances() {
+        const err = document.getElementById('step2Error');
+        const resultCard = document.getElementById('step3Card');
+        const output = document.getElementById('finalOutput');
+        err.textContent = '';
+
+        if (expenses.length === 0) {
+            err.textContent = 'Add at least one expense to calculate settlements.';
+            return;
+        }
+
+        const netBalances = {};
+        people.forEach(p => netBalances[p] = 0);
+
+        expenses.forEach(e => {
+            netBalances[e.payer] += e.amount;
+            const splitShare = e.amount / e.beneficiaries.length;
+            e.beneficiaries.forEach(p => {
+                netBalances[p] -= splitShare;
+            });
+        });
+
+        const debtors = [];
+        const creditors = [];
+
+        people.forEach(p => {
+            const bal = netBalances[p];
+            if (bal < -0.009) debtors.push({ name: p, amount: Math.abs(bal) });
+            else if (bal > 0.009) creditors.push({ name: p, amount: bal });
+        });
+
+        const transactions = [];
+        let dIdx = 0;
+        let cIdx = 0;
+
+        while (dIdx < debtors.length && cIdx < creditors.length) {
+            const debtor = debtors[dIdx];
+            const creditor = creditors[cIdx];
+            const settleAmount = Math.min(debtor.amount, creditor.amount);
+
+            transactions.push({
+                from: debtor.name,
+                to: creditor.name,
+                amount: settleAmount.toFixed(2)
+            });
+
+            debtor.amount -= settleAmount;
+            creditor.amount -= settleAmount;
+
+            if (debtor.amount < 0.01) dIdx++;
+            if (creditor.amount < 0.01) cIdx++;
+        }
+
+        // Render Balances
+        let html = `<label>Group Balances</label><div style="margin: 8px 0 16px;">`;
+        people.forEach(p => {
+            const bal = netBalances[p];
+            if (bal > 0.01) {
+                html += `<div class="balance-pill positive"><span>${p}</span><span>Gets back +$${bal.toFixed(2)}</span></div>`;
+            } else if (bal < -0.01) {
+                html += `<div class="balance-pill negative"><span>${p}</span><span>Owes -$${Math.abs(bal).toFixed(2)}</span></div>`;
             } else {
-                resultHTML += `<ul>`;
-                transactions.forEach(transaction => {
-                    resultHTML += `<li>${transaction}</li>`;
-                });
-                resultHTML += `</ul>`;
+                html += `<div class="balance-pill neutral"><span>${p}</span><span>Settled ($0.00)</span></div>`;
             }
+        });
+        html += `</div>`;
 
-            resultDiv.innerHTML = resultHTML;
-            resultDiv.style.display = 'block';
+        // Render Transactions
+        html += `<label>Who Pays Whom</label><div style="margin-top: 8px;">`;
+        if (transactions.length === 0) {
+            html += `<p style="color: var(--text-muted); font-size: 0.9rem;">Everyone is completely squared away!</p>`;
+        } else {
+            transactions.forEach(t => {
+                html += `
+                    <div class="transfer-row">
+                        <div class="transfer-people">
+                            <span>${t.from}</span>
+                            <span class="transfer-arrow">→</span>
+                            <span>${t.to}</span>
+                        </div>
+                        <div style="font-weight: 800; color: var(--primary); font-size: 1.05rem;">
+                            $${t.amount}
+                        </div>
+                    </div>
+                `;
+            });
         }
-    </script>
+        html += `</div>`;
+
+        output.innerHTML = html;
+        resultCard.classList.remove('hidden');
+        resultCard.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
 </body>
 </html>
